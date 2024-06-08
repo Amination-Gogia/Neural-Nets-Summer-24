@@ -84,6 +84,9 @@ class Trainer:
         self.model = model
         self.target = y
         self.model.forward(X)
+        self.X = X
+        self._non_avg_a_diff = []
+        self._non_avg_a_out_diff = np.random.randn(*(self.model.output_layer.biases.shape[0], self.X.shape[1]))
         self.hidd_w_diff_list = []
         self.hidd_b_diff_list = []
         self.a_diff_list = []
@@ -91,10 +94,12 @@ class Trainer:
             self.hidd_w_diff_list.append(np.random.randn(*(i.weights.shape)))
             self.hidd_b_diff_list.append(np.random.randn(*(i.biases.shape)))
             self.a_diff_list.append(np.random.randn(*(i.biases.shape)))
+            self._non_avg_a_diff.append(np.random.randn(*(i.biases.shape[0], self.X.shape[1])))
         self.out_w_diff = np.random.randn(*(self.model.output_layer.weights.shape))
         self.out_b_diff = np.random.randn(*(self.model.output_layer.biases.shape))
         self.out_a_diff = np.random.randn(*(self.model.output_layer.biases.shape))
-        self.X = X
+        
+
         
 
     def calc_dc_da_outer(self):
@@ -120,6 +125,7 @@ class Trainer:
             dc_da_outer[int_tar_classes[train_example], train_example] -= 1
         #print(f'dc_da_outerJ: {dc_da_outer}')
         dc_da_outer = dc_da_outer * ReLU_derivative(norm_output)
+        self._non_avg_a_out_diff = dc_da_outer
         dc_da_outer_avg = np.average(dc_da_outer, axis = 1, keepdims= True)
         self.out_a_diff = dc_da_outer_avg 
         return dc_da_outer_avg
@@ -129,18 +135,29 @@ class Trainer:
         if layer_ind == (n_hid_layers - 1):
             # print(self.out_a_diff)
             # print(self.model.hidden_layers[-1].output)
-            relu_a_out = ReLU_derivative(self.model.output_layer.output) * self.out_a_diff
-            dc_da_last_hidd_matrix = self.model.output_layer.weights.T @ relu_a_out
-            dc_da_last_hidd = np.average(dc_da_last_hidd_matrix, axis=1, keepdims= True)
-            self.a_diff_list[layer_ind] = dc_da_last_hidd
-            return dc_da_last_hidd
+            # relu_a_out = ReLU_derivative(self.model.output_layer.output) * self.out_a_diff
+            # dc_da_last_hidd_matrix = self.model.output_layer.weights.T @ relu_a_out
+            # dc_da_last_hidd = np.average(dc_da_last_hidd_matrix, axis=1, keepdims= True)
+            # self.a_diff_list[layer_ind] = dc_da_last_hidd
+            relu_a_out = ReLU_derivative(self.model.output_layer.output) * self._non_avg_a_out_diff
+            # print(f'relu_a_out : {relu_a_out}')
+            temp = self.model.output_layer.weights.T @ relu_a_out
+            self._non_avg_a_diff[layer_ind] = temp
+            self.a_diff_list[layer_ind] = np.average(temp, axis=1, keepdims= True)
+            return self.a_diff_list[layer_ind]
         elif layer_ind < (n_hid_layers - 1):
-            relu_a_out = ReLU_derivative(self.model.hidden_layers[layer_ind + 1].output) * self.a_diff_list[layer_ind + 1].reshape(-1, 1)
-            # print(self.model.hidden_layers[layer_ind + 1])
-            dc_da_curr_matrix = self.model.hidden_layers[layer_ind + 1].weights.T @ relu_a_out
-            dc_da_curr = np.average(dc_da_curr_matrix, axis=1, keepdims= True)
-            self.a_diff_list[layer_ind] = dc_da_curr
-            return dc_da_curr
+            # relu_a_out = ReLU_derivative(self.model.hidden_layers[layer_ind + 1].output) * self.a_diff_list[layer_ind + 1].reshape(-1, 1)
+            # # print(self.model.hidden_layers[layer_ind + 1])
+            # dc_da_curr_matrix = self.model.hidden_layers[layer_ind + 1].weights.T @ relu_a_out
+            # dc_da_curr = np.average(dc_da_curr_matrix, axis=1, keepdims= True)
+            # self.a_diff_list[layer_ind] = dc_da_curr
+            # return dc_da_curr
+            relu_a_out = ReLU_derivative(self.model.hidden_layers[layer_ind + 1].output) * self._non_avg_a_diff[layer_ind + 1]
+            # print(f'relu_a_out : {relu_a_out}')
+            temp = self.model.hidden_layers[layer_ind + 1].weights.T @ relu_a_out
+            self._non_avg_a_diff[layer_ind] = temp
+            self.a_diff_list[layer_ind] = np.average(temp, axis=1, keepdims= True)
+            return self.a_diff_list[layer_ind]
         # print(dc_da_last_hidd)
         pass
 
@@ -159,7 +176,7 @@ class Trainer:
             temp = ReLU_derivative(self.model.hidden_layers[layer_ind].output) * self.a_diff_list[0]
             ## print(f'temp: {temp}')
             self.hidd_w_diff_list[0] = temp @ (self.X.T) 
-            print(f'self.hidd_w_diff_list[0] = {self.hidd_w_diff_list[0]}')
+            ## print(f'self.hidd_w_diff_list[0] = {self.hidd_w_diff_list[0]}')
             return self.hidd_w_diff_list[0]
         elif layer_ind <= n_hid_layers:
             temp = ReLU_derivative(self.model.hidden_layers[layer_ind].output) * self.a_diff_list[layer_ind]
