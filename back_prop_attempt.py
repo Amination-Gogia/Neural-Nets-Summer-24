@@ -22,7 +22,7 @@ def Softmax_derivative():
 class Layer:
     def __init__(self, n_inputs, n_neurons):
         self.weights = np.random.randn(n_neurons, n_inputs)
-        self.biases = np.zeros((n_neurons, 1))
+        self.biases = np.random.randn(n_neurons, 1)
     def forward(self, inputs):
         ## a_n = W_n-1 a_n-1 + b_n-1
         inputs = inputs.reshape(self.weights.shape[1], -1)
@@ -194,7 +194,7 @@ class Trainer:
 # l1 = Layer(2,3)
 
 
-n1 = Network(3,3,4)
+n1 = Network(2,2,4)
 
 # n1.forward(np.array(([1,2,3], [2,34,4])))
 # print(n1.result)
@@ -202,15 +202,15 @@ n1 = Network(3,3,4)
 # c = n1.compute_cost(np.array(([1,2,3])), np.array([1]))
 # print(c)
 
-X_trial = np.array(([1,2,3], [4,5,6])).T
-y_trial = np.array(([1,0,0], [0,1,0])).T
+X_trial = np.array(([2, 53], [4, 56], [1, 64], [2, 25], [3, 45], [5, 24], [1, 72], [1, 54], [3, 63])).T
+y_trial = np.array((0, 1, 0, 0, 0, 1, 1, 0, 1)).T
 
 t = Trainer(n1, X_trial, y_trial)
 print(t.model.result)
 print(t.model.compute_cost(X_trial, y_trial))
 # print(t.calc_dc_da_outer())
 
-alpha = 0.001
+alpha = 0.01
 # print(t.model.output_layer.biases)
 # t.model.output_layer.weights - t.out_w_diff * alpha
 # t.model.output_layer.biases -= t.out_b_diff * alpha
@@ -253,7 +253,12 @@ alpha = 0.001
     
     
     
-t.lower_the_cost(100, 0.001)
+t.lower_the_cost(50, 0.01)
     
 print(t.model.result)
 print(t.model.compute_cost(X_trial, y_trial))
+
+test_in = np.array((2, 53))
+
+n1.forward(test_in)
+print(n1.result)
