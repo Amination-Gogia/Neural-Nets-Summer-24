@@ -111,15 +111,18 @@ class Trainer:
                 
 
         norm_output = self.model.result
-        dc_da_outer = norm_output * ReLU_derivative(norm_output)
-        dc_da_outer = 1/m * np.sum(norm_output, axis = 1, keepdims= True) ## can use np.average
+        dc_da_outer = norm_output 
+        
         # print(tar_class)
         # dc_da_outer[tar_class.astype(int), :] -= 1 
-        for x in tar_class.astype(int):
-            dc_da_outer[x] -= 1/m 
+        int_tar_classes = tar_class.astype(int)
+        for train_example in range(m):
+            dc_da_outer[int_tar_classes[train_example], train_example] -= 1
         #print(f'dc_da_outerJ: {dc_da_outer}')
-        self.out_a_diff = dc_da_outer 
-        return dc_da_outer
+        dc_da_outer = dc_da_outer * ReLU_derivative(norm_output)
+        dc_da_outer_avg = np.average(dc_da_outer, axis = 1, keepdims= True)
+        self.out_a_diff = dc_da_outer_avg 
+        return dc_da_outer_avg
 
     def calc_dc_da_hidden(self, layer_ind):
         n_hid_layers = len(self.model.hidden_layers)
