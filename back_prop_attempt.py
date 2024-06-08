@@ -114,7 +114,10 @@ class Trainer:
         dc_da_outer = norm_output * ReLU_derivative(norm_output)
         dc_da_outer = 1/m * np.sum(norm_output, axis = 1, keepdims= True) ## can use np.average
         # print(tar_class)
-        dc_da_outer[tar_class.astype(int), :] -= 1 
+        # dc_da_outer[tar_class.astype(int), :] -= 1 
+        for x in tar_class.astype(int):
+            dc_da_outer[x] -= 1/m 
+        #print(f'dc_da_outerJ: {dc_da_outer}')
         self.out_a_diff = dc_da_outer 
         return dc_da_outer
 
@@ -153,6 +156,7 @@ class Trainer:
             temp = ReLU_derivative(self.model.hidden_layers[layer_ind].output) * self.a_diff_list[0]
             ## print(f'temp: {temp}')
             self.hidd_w_diff_list[0] = temp @ (self.X.T) 
+            print(f'self.hidd_w_diff_list[0] = {self.hidd_w_diff_list[0]}')
             return self.hidd_w_diff_list[0]
         elif layer_ind <= n_hid_layers:
             temp = ReLU_derivative(self.model.hidden_layers[layer_ind].output) * self.a_diff_list[layer_ind]
@@ -160,9 +164,9 @@ class Trainer:
             ## print(f'Check pls: {temp @ self.X.T}')
             return self.hidd_w_diff_list[layer_ind]
     def calc_dc_dw_outer(self):
-        prev_a_sum = np.sum(self.model.hidden_layers[-1].output, axis= 1, keepdims=True)
+        prev_a_avg = np.average(self.model.hidden_layers[-1].output, axis= 1, keepdims=True)
         # print(prev_a_avg)
-        dc_dw_outer =  self.out_a_diff @ prev_a_sum.T
+        dc_dw_outer =  self.out_a_diff @ prev_a_avg.T
         self.out_w_diff = dc_dw_outer 
         return dc_dw_outer
 
@@ -258,4 +262,4 @@ t.lower_the_cost(30, 0.01)
 print(t.model.result)
 print(t.model.compute_cost(X_trial, y_trial))
 
-print(t.model.hidden_layers[0].weights)
+# print(t.model.hidden_layers[0].weights)
