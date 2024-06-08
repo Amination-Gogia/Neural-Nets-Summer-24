@@ -194,7 +194,7 @@ class Trainer:
 # l1 = Layer(2,3)
 
 
-n1 = Network(2,2,4)
+n1 = Network(2,2,4,5)
 
 # n1.forward(np.array(([1,2,3], [2,34,4])))
 # print(n1.result)
@@ -253,12 +253,9 @@ alpha = 0.01
     
     
     
-t.lower_the_cost(50, 0.01)
+t.lower_the_cost(30, 0.01)
     
 print(t.model.result)
 print(t.model.compute_cost(X_trial, y_trial))
 
-test_in = np.array((2, 53))
-
-n1.forward(test_in)
-print(n1.result)
+print(t.model.hidden_layers[0].weights)
