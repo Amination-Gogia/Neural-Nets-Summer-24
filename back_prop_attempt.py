@@ -172,24 +172,32 @@ class Trainer:
     
     def calc_dc_dw_hidden(self, layer_ind):
         n_hid_layers = len(self.model.hidden_layers)
+        if self.target.ndim == 1:
+            m = len(self.target)
+        elif self.target.ndim > 1:
+            m = self.target.shape[1]
         # dc_dw_outer =  self._non_avg_a_out_diff @ self.model.hidden_layers[-1].output.T
         # self.out_w_diff = dc_dw_outer 
         # return dc_dw_outer
         if layer_ind == 0:
             temp = ReLU_derivative(self.model.hidden_layers[layer_ind].output) * self._non_avg_a_diff[0]
             ## print(f'temp: {temp}')
-            self.hidd_w_diff_list[0] = temp @ (self.X.T) 
+            self.hidd_w_diff_list[0] = 1/m * temp @ (self.X.T) 
             ## print(f'self.hidd_w_diff_list[0] = {self.hidd_w_diff_list[0]}')
             return self.hidd_w_diff_list[0]
         elif layer_ind <= n_hid_layers:
             temp = ReLU_derivative(self.model.hidden_layers[layer_ind].output) * self._non_avg_a_diff[layer_ind]
-            self.hidd_w_diff_list[layer_ind] = temp @ (self.model.hidden_layers[layer_ind - 1].output).T 
+            self.hidd_w_diff_list[layer_ind] = 1/m * temp @ (self.model.hidden_layers[layer_ind - 1].output).T 
             ## print(f'Check pls: {temp @ self.X.T}')
             return self.hidd_w_diff_list[layer_ind]
     def calc_dc_dw_outer(self):
         # prev_a_avg = np.average(self.model.hidden_layers[-1].output, axis= 1, keepdims=True)
         # print(prev_a_avg)
-        dc_dw_outer =  self._non_avg_a_out_diff @ self.model.hidden_layers[-1].output.T
+        if self.target.ndim == 1:
+            m = len(self.target)
+        elif self.target.ndim > 1:
+            m = self.target.shape[1]
+        dc_dw_outer =  1/m * self._non_avg_a_out_diff @ self.model.hidden_layers[-1].output.T
         self.out_w_diff = dc_dw_outer 
         return dc_dw_outer
 
