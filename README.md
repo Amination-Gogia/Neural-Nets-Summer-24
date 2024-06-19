@@ -1,4 +1,13 @@
-Contains lecture code-alongs of the Neural Networks from scratch playlist.
+# Seasons of Code 2024
 
-Contains an independent attempt to code back-propagation, inspired from the above playlist and a Neural Networks series by 3 Blue 1 Brown. This has not yet been tested, or verified by someone else.
-Have to rewrite that, making the code more clean, once I learn NumPy better.
+## Graph Neural Network Models for Network Analysis and Generation
+
+### Overview
+
+This repository contains my work and learning journey during the Summer of Code 2024. The resources and code include lecture code-alongs from the Sentdex playlist and assignments from Andrew NG's Deep Learning Specialization.
+
+### Contents
+
+- **Sentdex Lectures Plain Neural Nets**: This section includes code from the Sentdex playlist on Graph Neural Networks.
+  - YouTube Playlist: [Graph Neural Networks - Sentdex](https://www.youtube.com/watch?v=Wo5dMEP_BbI&list=PLQVvvaa0QuDcjD5BAw2DxE6OF2tius3V3)
+- **coursera-deep-learning-specialisation**: Assignments and projects from Andrew NG's Deep Learning Specialization to enhance understanding of neural networks and CNNs.
