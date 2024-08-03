@@ -16,4 +16,4 @@ This repository contains my work and learning journey during the Seasons of Code
 - **Pytorch_sentdex**: This section includes code notebooks from the Sentdex Playlist on PyTorch.
   - YouTube Playlist: [Sentdex PyTorch Tutorial](https://youtube.com/playlist?list=PLQVvvaa0QuDdeMyHEYc0gxFpYwHY2Qfdh&si=z0dxdXu4qBneuiZ9)
 - **Official PyTorch Beginner Series**: This section includes notebooks from the Official PyTorch playlist.
-  - YouTube Playlist: [PyTorch Beginner Series](https://youtube.com/playlist?list=PLQVvvaa0QuDdeMyHEYc0gxFpYwHY2Qfdh&si=z0dxdXu4qBneuiZ9) 
+  - YouTube Playlist: [PyTorch Beginner Series](https://youtube.com/playlist?list=PL_lsbAsL_o2CTlGHgMxNrKhzP97BaG9ZN&si=EG2yzLe2ZEOkQkHQ)) 
